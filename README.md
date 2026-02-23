@@ -1,77 +1,45 @@
 # Retirement Planning App (Local Python MVP)
 
-This repository contains the discovery and planning artifacts for a **locally executed Python retirement planning app** focused on a single married couple in the U.S.
+This repository now includes an initial runnable Python scaffold for the retirement planner plus the discovery requirements.
 
-## Current Project Status
+## Current Status
 
-The project is currently in the **requirements and design-definition phase**. The detailed MVP scope, assumptions, and implementation decisions are captured in:
+- Discovery requirements are tracked in `discovery_questionnaire.md` (v0.4).
+- A first CLI implementation is available in `retirement_planner/`.
+- The CLI validates input JSON (fail-fast) and generates yearly PNG charts for worst/average/best scenarios.
 
-- `discovery_questionnaire.md`
+## Implemented MVP Foundations
 
-## MVP Goals
+- JSON input loading and validation.
+- Support for account types: `401k`, `roth_ira`, `traditional_ira`, `taxable`.
+- Support for income types: `w2`, `1099`, `dividend`.
+- W-2 salary growth-rate assumption.
+- Tax scaffolding for federal + state support (`MA`, `CA`) with tax year baseline `2026`.
+- RMD handling for applicable traditional balances.
+- PNG chart outputs:
+  - `account_values_<scenario>.png`
+  - `spending_sources_<scenario>.png`
 
-The initial version is intended to:
-
-1. Support **early retirement planning**.
-2. Include key **federal employee concepts** (FERS, TSP, FEHB, Social Security supplement).
-3. Produce **yearly graphical outputs** from local Python execution.
-
-## Key Product Decisions (v0.4)
-
-- Input format: **JSON** (no account-linking integrations).
-- Modeling approach: **deterministic scenarios** (best / average / worst).
-- Tax scope: **U.S. federal bracket logic with filing status**, plus state tax support for at least two states (including **MA**).
-- Initial tax-year baseline: **2026**.
-- Withdrawal behavior: **user-configurable in input JSON**.
-- Chart outputs: **PNG files**.
-- Validation: **fail-fast** on missing/invalid JSON fields.
-- Include **RMD handling** for applicable account types.
-- Support account coverage for at least **401(k), Roth IRA, Traditional IRA, and taxable investment accounts**.
-- Support income coverage for at least **W-2, freelance/1099, and dividend** income, including **W-2 growth-rate assumptions**.
-
-## Repository Contents
-
-- `discovery_questionnaire.md` — consolidated requirements and decision log for v0.4.
-## Key Product Decisions (v0.3)
-
-- Input format: **JSON** (no account-linking integrations).
-- Modeling approach: **deterministic scenarios** (best / average / worst).
-- Tax scope: **U.S. federal bracket logic with filing status**.
-- Withdrawal behavior: **user-configurable in input JSON**.
-- Chart outputs: **PNG files**.
-- Validation: **fail-fast** on missing/invalid JSON fields.
-
-## Repository Contents
-
-- `discovery_questionnaire.md` — consolidated requirements and decision log for v0.3.
-- `README.md` — project overview and quick-start orientation.
-
-## Suggested Next Build Steps
-
-1. Define and document a strict JSON schema for all household, income, account, and scenario inputs.
-2. Implement input validation that exits with clear error messages on schema violations.
-3. Build a deterministic year-by-year projection engine for both spouses across the model horizon.
-4. Add federal employee-specific modules (FERS estimate, TSP flows, FEHB assumptions, SS supplement timing).
-5. Generate the two primary yearly charts:
-   - Account values over time.
-   - Spending-source stacked bar chart.
-
-## Local Workflow
-
-Once implementation begins, a typical local workflow can be:
+## Quick Start
 
 ```bash
-# 1) Create/activate a Python virtual environment
 python -m venv .venv
 source .venv/bin/activate
-
-# 2) Install dependencies (to be added during implementation)
 pip install -r requirements.txt
 
-# 3) Run the planner (entrypoint to be added)
-python -m retirement_planner --input sample_plan.json --output ./out
+python -m retirement_planner --input sample_plan.json --output out
 ```
 
-## Contributing
+## Repository Contents
 
-For now, keep changes small and focused, and update `discovery_questionnaire.md` whenever a major requirement or decision changes.
+- `discovery_questionnaire.md` — requirements and decisions.
+- `sample_plan.json` — example input for local runs.
+- `requirements.txt` — Python dependencies.
+- `retirement_planner/` — initial planner CLI and projection/chart modules.
+
+## Next Build Steps
+
+1. Replace simplified tax scaffolding with full tax-engine detail for 2026 tables and richer state logic.
+2. Add contribution and employer-match phase modeling with work/retirement transitions by spouse.
+3. Add per-account withdrawal tax treatment and RMD reinvestment behavior.
+4. Define formal JSON schema and add automated tests.
