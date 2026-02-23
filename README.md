@@ -1,0 +1,45 @@
+# Retirement Planning App (Local Python MVP)
+
+This repository now includes an initial runnable Python scaffold for the retirement planner plus the discovery requirements.
+
+## Current Status
+
+- Discovery requirements are tracked in `discovery_questionnaire.md` (v0.4).
+- A first CLI implementation is available in `retirement_planner/`.
+- The CLI validates input JSON (fail-fast) and generates yearly PNG charts for worst/average/best scenarios.
+
+## Implemented MVP Foundations
+
+- JSON input loading and validation.
+- Support for account types: `401k`, `roth_ira`, `traditional_ira`, `taxable`.
+- Support for income types: `w2`, `1099`, `dividend`.
+- W-2 salary growth-rate assumption.
+- Tax scaffolding for federal + state support (`MA`, `CA`) with tax year baseline `2026`.
+- RMD handling for applicable traditional balances.
+- PNG chart outputs:
+  - `account_values_<scenario>.png`
+  - `spending_sources_<scenario>.png`
+
+## Quick Start
+
+```bash
+python -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+
+python -m retirement_planner --input sample_plan.json --output out
+```
+
+## Repository Contents
+
+- `discovery_questionnaire.md` — requirements and decisions.
+- `sample_plan.json` — example input for local runs.
+- `requirements.txt` — Python dependencies.
+- `retirement_planner/` — initial planner CLI and projection/chart modules.
+
+## Next Build Steps
+
+1. Replace simplified tax scaffolding with full tax-engine detail for 2026 tables and richer state logic.
+2. Add contribution and employer-match phase modeling with work/retirement transitions by spouse.
+3. Add per-account withdrawal tax treatment and RMD reinvestment behavior.
+4. Define formal JSON schema and add automated tests.
