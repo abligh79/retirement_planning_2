@@ -1,4 +1,4 @@
-# Retirement Planning App — Requirements (v0.3)
+# Retirement Planning App — Requirements (v0.4)
 
 This document captures confirmed requirements and implementation decisions for a **locally executed Python retirement planning app**.
 
@@ -37,8 +37,27 @@ This document captures confirmed requirements and implementation decisions for a
 All of the following are in-scope for v1:
 - **FERS pension estimate**
 - **TSP contribution/match modeling**
+- **401(k) employer-match modeling** (in addition to TSP matching)
 - **FEHB healthcare cost assumptions**
 - **Social Security supplement assumptions**
+
+## Tax Requirements (v1)
+- Implement **detailed U.S. federal bracket logic** and filing-status logic.
+- Include **state income tax support for at least two states**, with **Massachusetts (MA)** required as one supported state.
+- Start with **tax year 2026** assumptions/tables.
+- Include **RMD (Required Minimum Distribution)** handling for applicable account types.
+
+## Account & Income Modeling Requirements (v1)
+- Support multiple account types, including at least:
+  - **401(k)**
+  - **Roth IRA**
+  - **Traditional IRA**
+  - **Taxable investment account**
+- Support multiple income types, including at least:
+  - **W-2 wage income**
+  - **Freelance / 1099 income**
+  - **Dividend income**
+- Include a configurable **growth rate for W-2 salary** over time.
 
 ## Scenario & Assumption Coverage
 Scenario exploration should support changes in:
@@ -65,11 +84,15 @@ The following yearly charts are required in v1:
 - Deterministic projections for best/average/worst and custom scenarios.
 - Yearly visualization outputs for account trajectories and spending-source composition.
 
-## Confirmed Implementation Decisions (v0.3)
+## Confirmed Implementation Decisions (v0.4)
 1. **Tax detail depth:** Use **detailed U.S. federal tax bracket logic** and filing status logic.
-2. **Withdrawal strategy:** Spending-withdrawal order is **user-configurable from the input JSON file**.
-3. **Output format:** Generate chart outputs as **PNG files**.
-4. **Validation strictness:** Use **fail-fast validation** for missing/invalid JSON fields.
+2. **State taxes:** Support at least two state income tax models, including **MA**.
+3. **Tax-year baseline:** Start with **2026** tax-year assumptions.
+4. **Withdrawal strategy:** Spending-withdrawal order is **user-configurable from the input JSON file**.
+5. **Output format:** Generate chart outputs as **PNG files**.
+6. **Validation strictness:** Use **fail-fast validation** for missing/invalid JSON fields.
+7. **Scenario definitions:** Exact best/average/worst definitions are **TBD** and will be refined during implementation.
+8. **Output success criteria:** Detailed pass/fail planning success metrics are **TBD** and will be refined during implementation.
 
 ## Initial Decision Log
 - Decision: Focus scope on one married-couple household.
@@ -91,9 +114,21 @@ The following yearly charts are required in v1:
 
 - Decision: Implement detailed U.S. federal tax bracket and filing-status logic.
   - Rationale: Explicitly requested for v1 tax modeling depth.
+- Decision: Add state income tax support for at least two states, including MA.
+  - Rationale: Required for more realistic U.S. household projections.
+- Decision: Use tax year 2026 as the initial baseline.
+  - Rationale: Provides a concrete starting point for coding and validation.
 - Decision: Make withdrawal order user-configurable via input JSON.
   - Rationale: Enables scenario flexibility without code changes.
 - Decision: Standardize chart output to PNG.
   - Rationale: Clear local artifact format for analysis and sharing.
 - Decision: Enforce fail-fast input validation.
   - Rationale: Prevents silent defaults and improves model correctness.
+- Decision: Support account types including 401(k), Roth IRA, Traditional IRA, and taxable investment accounts.
+  - Rationale: Establishes the minimum account coverage for practical planning.
+- Decision: Support income types including W-2, 1099, and dividends, plus W-2 growth-rate assumptions.
+  - Rationale: Captures core working-years and investment-income cash flows.
+- Decision: Include RMD handling for applicable accounts.
+  - Rationale: Required for realistic retirement withdrawal and tax modeling.
+- Decision: Leave scenario parameterization details and output success thresholds as TBD.
+  - Rationale: These will be finalized through iterative implementation and review.

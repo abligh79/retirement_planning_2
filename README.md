@@ -16,6 +16,22 @@ The initial version is intended to:
 2. Include key **federal employee concepts** (FERS, TSP, FEHB, Social Security supplement).
 3. Produce **yearly graphical outputs** from local Python execution.
 
+## Key Product Decisions (v0.4)
+
+- Input format: **JSON** (no account-linking integrations).
+- Modeling approach: **deterministic scenarios** (best / average / worst).
+- Tax scope: **U.S. federal bracket logic with filing status**, plus state tax support for at least two states (including **MA**).
+- Initial tax-year baseline: **2026**.
+- Withdrawal behavior: **user-configurable in input JSON**.
+- Chart outputs: **PNG files**.
+- Validation: **fail-fast** on missing/invalid JSON fields.
+- Include **RMD handling** for applicable account types.
+- Support account coverage for at least **401(k), Roth IRA, Traditional IRA, and taxable investment accounts**.
+- Support income coverage for at least **W-2, freelance/1099, and dividend** income, including **W-2 growth-rate assumptions**.
+
+## Repository Contents
+
+- `discovery_questionnaire.md` — consolidated requirements and decision log for v0.4.
 ## Key Product Decisions (v0.3)
 
 - Input format: **JSON** (no account-linking integrations).
