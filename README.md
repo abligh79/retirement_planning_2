@@ -12,8 +12,8 @@ This repository now includes an initial runnable Python scaffold for the retirem
 
 - JSON input loading and validation.
 - Support for account types: `401k`, `roth_ira`, `traditional_ira`, `taxable`.
-- Support for income types: `w2`, `1099`, `dividend`.
-- W-2 salary growth-rate assumption.
+- Support for income types: `w2`, `1099`, `dividend` (including multiple W-2 and 1099 entries).
+- W-2 salary growth-rate assumption and per-income active windows (`start_year`/`end_year`).
 - Tax scaffolding for federal + state support (`MA`, `CA`) with tax year baseline `2026`.
 - RMD handling for applicable traditional balances.
 - PNG chart outputs:
@@ -28,6 +28,9 @@ source .venv/bin/activate
 pip install -r requirements.txt
 
 python -m retirement_planner --input sample_plan.json --output out
+
+# optional: run a single scenario
+python -m retirement_planner --input sample_plan.json --output out --scenario average
 ```
 
 ## Repository Contents
@@ -42,4 +45,5 @@ python -m retirement_planner --input sample_plan.json --output out
 1. Replace simplified tax scaffolding with full tax-engine detail for 2026 tables and richer state logic.
 2. Add contribution and employer-match phase modeling with work/retirement transitions by spouse.
 3. Add per-account withdrawal tax treatment and RMD reinvestment behavior.
-4. Define formal JSON schema and add automated tests.
+4. Add spouse-level income reporting views and richer chart outputs.
+5. Define formal JSON schema and add automated tests.

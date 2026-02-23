@@ -9,11 +9,13 @@ from .engine import ProjectionResult
 
 def plot_account_values(result: ProjectionResult, output_dir: Path, scenario: str) -> Path:
     out = output_dir / f"account_values_{scenario}.png"
-    plt.figure(figsize=(10, 5))
-    plt.plot(result.years, result.total_balances, linewidth=2)
+    plt.figure(figsize=(11, 6))
+    for account_name, balances in result.account_balances.items():
+        plt.plot(result.years, balances, linewidth=2, label=account_name)
     plt.title(f"Account Values Over Time ({scenario.title()})")
     plt.xlabel("Year")
-    plt.ylabel("Total Account Value ($)")
+    plt.ylabel("Account Value ($)")
+    plt.legend(loc="upper left")
     plt.grid(alpha=0.3)
     plt.tight_layout()
     plt.savefig(out)

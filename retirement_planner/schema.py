@@ -31,20 +31,25 @@ def validate_plan(data: dict[str, Any]) -> None:
     spouses = _require(household, "spouses", list, "root.household")
     if len(spouses) != 2:
         raise ValidationError("root.household.spouses must contain exactly 2 spouses")
+
+    spouse_names = set()
     for idx, spouse in enumerate(spouses):
         if not isinstance(spouse, dict):
             raise ValidationError(f"root.household.spouses[{idx}] must be an object")
-        _require(spouse, "name", str, f"root.household.spouses[{idx}]")
+        name = _require(spouse, "name", str, f"root.household.spouses[{idx}]")
+        spouse_names.add(name)
         _require(spouse, "current_age", int, f"root.household.spouses[{idx}]")
         _require(spouse, "retirement_age", int, f"root.household.spouses[{idx}]")
         _require(spouse, "death_age", int, f"root.household.spouses[{idx}]")
 
     assumptions = _require(data, "assumptions", dict, "root")
-    _require(assumptions, "start_year", int, "root.assumptions")
-    _require(assumptions, "years", int, "root.assumptions")
+    start_year = _require(assumptions, "start_year", int, "root.assumptions")
+    years = _require(assumptions, "years", int, "root.assumptions")
     _require(assumptions, "inflation_rate", (int, float), "root.assumptions")
     _require(assumptions, "w2_growth_rate", (int, float), "root.assumptions")
     _require(assumptions, "tax_year", int, "root.assumptions")
+    if years <= 0:
+        raise ValidationError("root.assumptions.years must be > 0")
 
     taxes = _require(data, "taxes", dict, "root")
     state = _require(taxes, "state", str, "root.taxes")
@@ -76,6 +81,20 @@ def validate_plan(data: dict[str, Any]) -> None:
                 f"root.incomes[{idx}].type must be one of {sorted(ALLOWED_INCOME_TYPES)}"
             )
         _require(income, "amount", (int, float), f"root.incomes[{idx}]")
+        spouse = _require(income, "spouse", str, f"root.incomes[{idx}]")
+        if spouse not in spouse_names:
+            raise ValidationError(
+                f"root.incomes[{idx}].spouse must match one of household spouse names: {sorted(spouse_names)}"
+            )
+        inc_start = _require(income, "start_year", int, f"root.incomes[{idx}]")
+        inc_end = _require(income, "end_year", int, f"root.incomes[{idx}]")
+        if inc_end < inc_start:
+            raise ValidationError(f"root.incomes[{idx}].end_year must be >= start_year")
+        model_end = start_year + years - 1
+        if inc_end < start_year or inc_start > model_end:
+            raise ValidationError(
+                f"root.incomes[{idx}] active years must overlap model window {start_year}-{model_end}"
+            )
 
     spending = _require(data, "spending", dict, "root")
     _require(spending, "base_annual", (int, float), "root.spending")

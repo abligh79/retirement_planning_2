@@ -22,9 +22,11 @@
     {"name": "Joint Taxable", "type": "taxable", "balance": 140000, "growth_rate": 0.05}
   ],
   "incomes": [
-    {"type": "w2", "amount": 180000},
-    {"type": "1099", "amount": 12000},
-    {"type": "dividend", "amount": 6000}
+    {"type": "w2", "spouse": "Alex", "amount": 130000, "start_year": 2026, "end_year": 2040},
+    {"type": "w2", "spouse": "Jordan", "amount": 70000, "start_year": 2026, "end_year": 2045},
+    {"type": "1099", "spouse": "Alex", "amount": 12000, "start_year": 2027, "end_year": 2032},
+    {"type": "1099", "spouse": "Jordan", "amount": 8000, "start_year": 2030, "end_year": 2038},
+    {"type": "dividend", "spouse": "Alex", "amount": 6000, "start_year": 2026, "end_year": 2065}
   ],
   "spending": {
     "base_annual": 95000

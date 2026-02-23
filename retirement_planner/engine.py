@@ -15,16 +15,19 @@ SCENARIO_RETURN_ADJUST = {
 @dataclass
 class ProjectionResult:
     years: list[int]
-    total_balances: list[float]
+    account_balances: dict[str, list[float]]
     spending_by_source: dict[str, list[float]]
 
 
-def _income_for_year(incomes: list[dict[str, Any]], w2_growth_rate: float, year_idx: int) -> float:
+def _income_for_year(incomes: list[dict[str, Any]], current_year: int, w2_growth_rate: float) -> float:
     total = 0.0
     for income in incomes:
+        if current_year < income["start_year"] or current_year > income["end_year"]:
+            continue
         amount = float(income["amount"])
         if income["type"] == "w2":
-            total += amount * ((1 + w2_growth_rate) ** year_idx)
+            growth_years = current_year - int(income["start_year"])
+            total += amount * ((1 + w2_growth_rate) ** growth_years)
         else:
             total += amount
     return total
@@ -49,8 +52,8 @@ def run_plan(plan: dict[str, Any], scenario: str) -> ProjectionResult:
     state = plan["taxes"]["state"]
     oldest_age = max(s["current_age"] for s in plan["household"]["spouses"])
 
-    total_balances = []
     yearly_years = []
+    account_balances = {acct: [] for acct in balances}
     spending_sources = {acct: [] for acct in balances}
     spending_sources["income"] = []
 
@@ -61,7 +64,7 @@ def run_plan(plan: dict[str, Any], scenario: str) -> ProjectionResult:
         for acct in balances:
             balances[acct] *= 1 + growth_rates[acct]
 
-        total_income = _income_for_year(plan["incomes"], w2_growth, i)
+        total_income = _income_for_year(plan["incomes"], year, w2_growth)
         required_spending = base_spending * ((1 + inflation) ** i)
 
         current_age = oldest_age + i
@@ -93,6 +96,7 @@ def run_plan(plan: dict[str, Any], scenario: str) -> ProjectionResult:
             spending_sources[acct_name][-1] += draw
             remaining -= draw
 
-        total_balances.append(sum(balances.values()))
+        for acct, balance in balances.items():
+            account_balances[acct].append(balance)
 
-    return ProjectionResult(years=yearly_years, total_balances=total_balances, spending_by_source=spending_sources)
+    return ProjectionResult(years=yearly_years, account_balances=account_balances, spending_by_source=spending_sources)
