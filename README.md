@@ -32,6 +32,18 @@ The initial version is intended to:
 ## Repository Contents
 
 - `discovery_questionnaire.md` — consolidated requirements and decision log for v0.4.
+## Key Product Decisions (v0.3)
+
+- Input format: **JSON** (no account-linking integrations).
+- Modeling approach: **deterministic scenarios** (best / average / worst).
+- Tax scope: **U.S. federal bracket logic with filing status**.
+- Withdrawal behavior: **user-configurable in input JSON**.
+- Chart outputs: **PNG files**.
+- Validation: **fail-fast** on missing/invalid JSON fields.
+
+## Repository Contents
+
+- `discovery_questionnaire.md` — consolidated requirements and decision log for v0.3.
 - `README.md` — project overview and quick-start orientation.
 
 ## Suggested Next Build Steps
