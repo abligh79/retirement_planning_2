@@ -14,6 +14,8 @@ This repository now includes an initial runnable Python scaffold for the retirem
 - Support for account types: `401k`, `roth_ira`, `traditional_ira`, `taxable`.
 - Support for income types: `w2`, `1099`, `dividend` (including multiple W-2 and 1099 entries).
 - W-2 salary growth-rate assumption and per-income active windows (`start_year`/`end_year`).
+- W-2 employee 401(k) contribution allocation via `assumptions.w2_401k_contribution_rate`.
+- Post-tax surplus cash (after spending + tax + 401(k) contribution effects) is deposited into the taxable account.
 - Tax scaffolding for federal + state support (`MA`, `CA`) with tax year baseline `2026`.
 - RMD handling for applicable traditional balances.
 - PNG chart outputs:
@@ -32,6 +34,13 @@ python -m retirement_planner --input sample_plan.json --output out
 # optional: run a single scenario
 python -m retirement_planner --input sample_plan.json --output out --scenario average
 ```
+
+
+## Spending Chart Behavior
+
+- The `spending_sources_<scenario>.png` chart shows **only sources used to fund annual spending**.
+- Income is used first (after tax/401(k) treatment), then remaining spending is funded from accounts using `withdrawal_order`.
+- If post-tax income exceeds annual spending, the surplus is **not plotted as spending**; it is reinvested into the taxable account balance.
 
 ## Repository Contents
 

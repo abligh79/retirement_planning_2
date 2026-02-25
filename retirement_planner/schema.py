@@ -47,6 +47,7 @@ def validate_plan(data: dict[str, Any]) -> None:
     years = _require(assumptions, "years", int, "root.assumptions")
     _require(assumptions, "inflation_rate", (int, float), "root.assumptions")
     _require(assumptions, "w2_growth_rate", (int, float), "root.assumptions")
+    _require(assumptions, "w2_401k_contribution_rate", (int, float), "root.assumptions")
     _require(assumptions, "tax_year", int, "root.assumptions")
     if years <= 0:
         raise ValidationError("root.assumptions.years must be > 0")
@@ -70,6 +71,14 @@ def validate_plan(data: dict[str, Any]) -> None:
         _require(account, "name", str, f"root.accounts[{idx}]")
         _require(account, "balance", (int, float), f"root.accounts[{idx}]")
         _require(account, "growth_rate", (int, float), f"root.accounts[{idx}]")
+
+
+    has_401k = any(a.get("type") == "401k" for a in accounts)
+    has_taxable = any(a.get("type") == "taxable" for a in accounts)
+    if not has_401k:
+        raise ValidationError("root.accounts must include at least one 401k account")
+    if not has_taxable:
+        raise ValidationError("root.accounts must include at least one taxable account")
 
     incomes = _require(data, "incomes", list, "root")
     for idx, income in enumerate(incomes):
