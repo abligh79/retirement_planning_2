@@ -1,0 +1,101 @@
+{
+  "household": {
+    "spouses": [
+      {
+        "name": "Alex",
+        "current_age": 40,
+        "retirement_age": 55,
+        "death_age": 92
+      },
+      {
+        "name": "Jordan",
+        "current_age": 38,
+        "retirement_age": 57,
+        "death_age": 93
+      }
+    ]
+  },
+  "assumptions": {
+    "start_year": 2026,
+    "years": 40,
+    "inflation_rate": 0.025,
+    "w2_growth_rate": 0.03,
+    "tax_year": 2026,
+    "w2_401k_contribution_rate": 0.1
+  },
+  "taxes": {
+    "state": "MA"
+  },
+  "accounts": [
+    {
+      "name": "Alex 401k",
+      "type": "401k",
+      "balance": 550000,
+      "growth_rate": 0.06
+    },
+    {
+      "name": "Jordan Roth IRA",
+      "type": "roth_ira",
+      "balance": 120000,
+      "growth_rate": 0.06
+    },
+    {
+      "name": "Joint Traditional IRA",
+      "type": "traditional_ira",
+      "balance": 180000,
+      "growth_rate": 0.055
+    },
+    {
+      "name": "Joint Taxable",
+      "type": "taxable",
+      "balance": 140000,
+      "growth_rate": 0.05
+    }
+  ],
+  "incomes": [
+    {
+      "type": "w2",
+      "spouse": "Alex",
+      "amount": 130000,
+      "start_year": 2026,
+      "end_year": 2040
+    },
+    {
+      "type": "w2",
+      "spouse": "Jordan",
+      "amount": 70000,
+      "start_year": 2026,
+      "end_year": 2045
+    },
+    {
+      "type": "1099",
+      "spouse": "Alex",
+      "amount": 12000,
+      "start_year": 2027,
+      "end_year": 2032
+    },
+    {
+      "type": "1099",
+      "spouse": "Jordan",
+      "amount": 8000,
+      "start_year": 2030,
+      "end_year": 2038
+    },
+    {
+      "type": "dividend",
+      "spouse": "Alex",
+      "amount": 6000,
+      "start_year": 2026,
+      "end_year": 2065
+    }
+  ],
+  "spending": {
+    "base_annual": 95000
+  },
+  "withdrawal_order": [
+    "Joint Taxable",
+    "Alex 401k",
+    "Joint Traditional IRA",
+    "Jordan Roth IRA"
+  ]
+}
