@@ -38,7 +38,7 @@ python -m retirement_planner --input sample_plan.json --output out --scenario av
 
 ## Spending Chart Behavior
 
-- The `spending_sources_<scenario>.png` chart shows **only sources used to fund annual spending**.
+- The `spending_sources_<scenario>.png` chart shows **only sources used to fund annual spending**, split into each configured income stream (`w2`, `1099`, `dividend`) plus `rmd`, and then account withdrawals if needed.
 - Income is used first (after tax/401(k) treatment), then remaining spending is funded from accounts using `withdrawal_order`.
 - If post-tax income exceeds annual spending, the surplus is **not plotted as spending**; it is reinvested into the taxable account balance.
 

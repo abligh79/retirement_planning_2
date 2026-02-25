@@ -19,23 +19,36 @@ class ProjectionResult:
     spending_by_source: dict[str, list[float]]
 
 
-def _income_for_year(
-    incomes: list[dict[str, Any]], current_year: int, w2_growth_rate: float
-) -> tuple[float, float]:
-    total_income = 0.0
+def _income_label(income: dict[str, Any], idx: int) -> str:
+    return (
+        f"{income['type']}:{income['spouse']}"
+        f":{income['start_year']}-{income['end_year']}#{idx + 1}"
+    )
+
+
+def _income_components_for_year(
+    incomes: list[dict[str, Any]],
+    current_year: int,
+    w2_growth_rate: float,
+) -> tuple[dict[str, float], float]:
+    components: dict[str, float] = {}
     total_w2_income = 0.0
-    for income in incomes:
+
+    for idx, income in enumerate(incomes):
         if current_year < income["start_year"] or current_year > income["end_year"]:
             continue
+
         amount = float(income["amount"])
         if income["type"] == "w2":
             growth_years = current_year - int(income["start_year"])
             effective_amount = amount * ((1 + w2_growth_rate) ** growth_years)
-            total_income += effective_amount
             total_w2_income += effective_amount
         else:
-            total_income += amount
-    return total_income, total_w2_income
+            effective_amount = amount
+
+        components[_income_label(income, idx)] = effective_amount
+
+    return components, total_w2_income
 
 
 def run_plan(plan: dict[str, Any], scenario: str) -> ProjectionResult:
@@ -61,10 +74,14 @@ def run_plan(plan: dict[str, Any], scenario: str) -> ProjectionResult:
     state = plan["taxes"]["state"]
     oldest_age = max(s["current_age"] for s in plan["household"]["spouses"])
 
+    income_labels = [_income_label(income, idx) for idx, income in enumerate(plan["incomes"])]
+    income_labels.append("rmd")
+
     yearly_years = []
     account_balances = {acct: [] for acct in balances}
-    spending_sources = {acct: [] for acct in balances}
-    spending_sources["income"] = []
+    spending_sources = {label: [] for label in income_labels}
+    for acct in balances:
+        spending_sources[acct] = []
 
     for i in range(years):
         year = start_year + i
@@ -73,11 +90,9 @@ def run_plan(plan: dict[str, Any], scenario: str) -> ProjectionResult:
         for acct in balances:
             balances[acct] *= 1 + growth_rates[acct]
 
-        gross_income, w2_income = _income_for_year(plan["incomes"], year, w2_growth)
+        gross_components, w2_income = _income_components_for_year(plan["incomes"], year, w2_growth)
         employee_401k_contribution = w2_income * w2_401k_contrib_rate
         balances[first_401k_name] += employee_401k_contribution
-
-        required_spending = base_spending * ((1 + inflation) ** i)
 
         current_age = oldest_age + i
         traditional_total = sum(
@@ -85,15 +100,33 @@ def run_plan(plan: dict[str, Any], scenario: str) -> ProjectionResult:
         )
         rmd = estimate_rmd(current_age, traditional_total)
 
-        taxable_income = gross_income - employee_401k_contribution + rmd
+        taxable_components = {**gross_components}
+        taxable_components["rmd"] = rmd
+
+        if employee_401k_contribution > 0 and w2_income > 0:
+            for label in list(taxable_components):
+                if label.startswith("w2:"):
+                    w2_share = taxable_components[label] / w2_income
+                    taxable_components[label] -= employee_401k_contribution * w2_share
+
+        taxable_income = max(0.0, sum(taxable_components.values()))
         federal = federal_tax_mfj_2026(taxable_income)
         state_tax = state_income_tax(state, taxable_income)
         post_tax_income = max(0.0, taxable_income - federal - state_tax)
 
+        net_income_components = {label: 0.0 for label in income_labels}
+        if taxable_income > 0:
+            for label in taxable_components:
+                net_income_components[label] = post_tax_income * (taxable_components[label] / taxable_income)
+
+        required_spending = base_spending * ((1 + inflation) ** i)
         remaining = required_spending
-        from_income = min(remaining, post_tax_income)
-        spending_sources["income"].append(from_income)
-        remaining -= from_income
+
+        for label in income_labels:
+            available = net_income_components.get(label, 0.0)
+            used = min(remaining, available)
+            spending_sources[label].append(used)
+            remaining -= used
 
         for acct in balances:
             spending_sources[acct].append(0.0)
@@ -108,7 +141,8 @@ def run_plan(plan: dict[str, Any], scenario: str) -> ProjectionResult:
             spending_sources[acct_name][-1] += draw
             remaining -= draw
 
-        surplus_cash = max(0.0, post_tax_income - from_income)
+        income_spent = sum(spending_sources[label][-1] for label in income_labels)
+        surplus_cash = max(0.0, post_tax_income - income_spent)
         balances[taxable_account_name] += surplus_cash
 
         for acct, balance in balances.items():
